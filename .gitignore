@@ -1,0 +1,26 @@
+# Environment
+.env
+*.env
+
+# Go
+backend/vendor/
+backend/bin/
+backend/*.exe
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
