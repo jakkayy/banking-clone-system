@@ -1,10 +1,10 @@
-# JAKBank — Private Digital Banking
+# JAKBank — ระบบการธนาคารดิจิทัลที่เป็นส่วนตัว
 
 A full-stack banking portfolio project built with Go (Gin) + Next.js + PostgreSQL + Redis, featuring a premium dark/gold UI inspired by private banking aesthetics.
 
 ---
 
-## Tech Stack
+## สแต็กเทคโนโลยี
 
 | Layer | Technology |
 |---|---|
@@ -16,7 +16,7 @@ A full-stack banking portfolio project built with Go (Gin) + Next.js + PostgreSQ
 
 ---
 
-## Features
+## คุณสมบัติ
 
 - **Authentication** — Register, login with JWT, account lockout after 5 failed attempts (15-min cooldown)
 - **Accounts** — Open savings/checking accounts, view balances and account details
@@ -27,7 +27,7 @@ A full-stack banking portfolio project built with Go (Gin) + Next.js + PostgreSQ
 
 ---
 
-## Project Structure
+## โครงสร้างโปรเจค
 
 ```
 banking/
@@ -66,15 +66,15 @@ banking/
 
 ---
 
-## Getting Started
+## เริ่มต้นใช้งาน
 
-### Prerequisites
+### ข้อกำหนดเบื้องต้น
 
 - Docker & Docker Compose
 - Go 1.22+
 - Node.js 18+
 
-### 1. Clone and configure
+### 1. โคลนและตั้งค่า
 
 ```bash
 git clone https://github.com/jakkayy/banking.git
@@ -93,7 +93,7 @@ Copy and edit the frontend env file:
 cp frontend/.env.local.example frontend/.env.local
 ```
 
-### 2. Start infrastructure
+### 2. เริ่มโครงสร้างพื้นฐาน
 
 ```bash
 make up
@@ -101,7 +101,7 @@ make up
 
 This starts PostgreSQL, Redis, and pgAdmin. Migrations run automatically on first boot.
 
-### 3. Run the backend
+### 3. เรียกใช้ backend
 
 ```bash
 make dev-backend
@@ -109,7 +109,7 @@ make dev-backend
 
 API available at `http://localhost:8080`
 
-### 4. Run the frontend
+### 4. เรียกใช้ frontend
 
 ```bash
 make dev-frontend
@@ -119,7 +119,7 @@ App available at `http://localhost:3000`
 
 ---
 
-## API Endpoints
+## จุดปลายทาง API
 
 ```
 POST   /api/v1/auth/register
@@ -164,7 +164,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
 
 ---
 
-## Makefile Commands
+## คำสั่ง Makefile
 
 ```bash
 make up            # Start Docker services
@@ -178,7 +178,7 @@ make build-backend # Build Go binary
 
 ---
 
-## Architecture Notes
+## หมายเหตุสถาปัตยกรรม
 
 - **Clean Architecture** — Handler → Service → Repository with interface abstractions
 - **Atomic Transfers** — Uses PostgreSQL transactions with `SELECT FOR UPDATE`, locks acquired in consistent UUID order to prevent deadlocks
@@ -187,6 +187,6 @@ make build-backend # Build Go binary
 
 ---
 
-## License
+## ใบอนุญาต
 
 MIT
