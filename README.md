@@ -1,29 +1,30 @@
-# JAKBank — ระบบการธนาคารดิจิทัลที่เป็นส่วนตัว
+# JAKBank
 
-A full-stack banking portfolio project built with Go (Gin) + Next.js + PostgreSQL + Redis, featuring a premium dark/gold UI inspired by private banking aesthetics.
+ระบบธนาคารดิจิทัล Full-Stack สร้างด้วย Go + Next.js + PostgreSQL + Redis  
+UI ดีไซน์แนว Private Banking โทนสีเข้ม/ทอง
 
 ---
 
-## สแต็กเทคโนโลยี
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Go 1.26, Gin, JWT, bcrypt |
-| Frontend | Next.js 16 (App Router), TypeScript, Tailwind CSS v3, NextUI |
+| Backend | Go 1.22+, Gin, JWT, bcrypt |
+| Frontend | Next.js (App Router), TypeScript, Tailwind CSS v3, NextUI |
 | Database | PostgreSQL 16 |
 | Cache | Redis 7 |
 | Infrastructure | Docker Compose |
 
 ---
 
-## คุณสมบัติ
+## Features
 
-- **Authentication** — Register, login with JWT, account lockout after 5 failed attempts (15-min cooldown)
-- **Accounts** — Open savings/checking accounts, view balances and account details
-- **Transfers** — Atomic fund transfers with `SELECT FOR UPDATE` to prevent race conditions
-- **Deposits & Withdrawals** — Real-time balance updates
-- **Transaction History** — Paginated statement view per account
-- **Protected Routes** — Client-side auth guard, auto-redirect to login
+- **Authentication** — Register / Login ด้วย JWT, ล็อคบัญชีหลังพยายาม Login ผิด 5 ครั้ง (cooldown 15 นาที)
+- **Accounts** — เปิดบัญชีออมทรัพย์/กระแสรายวัน, ดูยอดคงเหลือและรายละเอียดบัญชี
+- **Transfer** — โอนเงินแบบ Atomic ด้วย `SELECT FOR UPDATE` ป้องกัน Race Condition
+- **Deposit / Withdraw** — ฝาก/ถอนเงิน อัปเดตยอดแบบ Real-time
+- **Transaction History** — ดูรายการย้อนหลังแบบ Paginated ต่อบัญชี
+- **Protected Routes** — Auth Guard ฝั่ง Client, Auto-redirect ไป Login
 
 ---
 
@@ -41,20 +42,19 @@ banking/
 │   │   ├── config/              # Env config loader
 │   │   ├── database/            # PostgreSQL connection
 │   │   └── response/            # Standardized JSON responses
-│   ├── db/migrations/           # SQL migration files
-│   └── .env                     # Backend env vars (not committed)
+│   └── db/migrations/           # SQL migration files
 ├── frontend/
 │   ├── app/                     # Next.js App Router pages
 │   │   ├── page.tsx             # Landing page
-│   │   ├── login/               # Sign in
-│   │   ├── register/            # Open account
-│   │   ├── dashboard/           # Overview
-│   │   ├── accounts/            # Portfolio list + detail
-│   │   ├── transfer/            # Wire transfer
-│   │   ├── deposit/             # Deposit funds
-│   │   └── withdraw/            # Withdraw funds
+│   │   ├── login/
+│   │   ├── register/
+│   │   ├── dashboard/
+│   │   ├── accounts/
+│   │   ├── transfer/
+│   │   ├── deposit/
+│   │   └── withdraw/
 │   ├── components/
-│   │   ├── AppLayout.tsx        # Sidebar layout with auth guard
+│   │   ├── AppLayout.tsx        # Sidebar layout + auth guard
 │   │   └── Providers.tsx        # NextUI provider wrapper
 │   └── lib/
 │       ├── api.ts               # Fetch-based API client
@@ -68,58 +68,55 @@ banking/
 
 ## เริ่มต้นใช้งาน
 
-### ข้อกำหนดเบื้องต้น
+### สิ่งที่ต้องติดตั้งก่อน
 
 - Docker & Docker Compose
 - Go 1.22+
 - Node.js 18+
 
-### 1. โคลนและตั้งค่า
+### 1. Clone โปรเจค
 
 ```bash
 git clone https://github.com/jakkayy/banking.git
 cd banking
 ```
 
-Copy and edit the backend env file:
+### 2. ตั้งค่า Environment Variables
 
 ```bash
 cp backend/.env.example backend/.env
-```
-
-Copy and edit the frontend env file:
-
-```bash
 cp frontend/.env.local.example frontend/.env.local
 ```
 
-### 2. เริ่มโครงสร้างพื้นฐาน
+แก้ไขค่าต่าง ๆ ตามต้องการ (ดูรายละเอียดด้านล่าง)
+
+### 3. เริ่ม Infrastructure
 
 ```bash
 make up
 ```
 
-This starts PostgreSQL, Redis, and pgAdmin. Migrations run automatically on first boot.
+รัน PostgreSQL, Redis และ pgAdmin — Migration รันอัตโนมัติตอน Boot ครั้งแรก
 
-### 3. เรียกใช้ backend
+### 4. รัน Backend
 
 ```bash
 make dev-backend
 ```
 
-API available at `http://localhost:8080`
+API พร้อมใช้งานที่ `http://localhost:8080`
 
-### 4. เรียกใช้ frontend
+### 5. รัน Frontend
 
 ```bash
 make dev-frontend
 ```
 
-App available at `http://localhost:3000`
+App พร้อมใช้งานที่ `http://localhost:3000`
 
 ---
 
-## จุดปลายทาง API
+## API Endpoints
 
 ```
 POST   /api/v1/auth/register
@@ -137,7 +134,7 @@ GET    /api/v1/transactions/account/:id?page=1&limit=10
 GET    /api/v1/transactions/:id
 ```
 
-All endpoints except `/auth/register` and `/auth/login` require `Authorization: Bearer <token>`.
+ทุก Endpoint ยกเว้น `/auth/register` และ `/auth/login` ต้องแนบ `Authorization: Bearer <token>`
 
 ---
 
@@ -148,9 +145,9 @@ All endpoints except `/auth/register` and `/auth/login` require `Authorization: 
 ```env
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=banking
+DB_USER=banking_user
+DB_PASSWORD=banking_password
+DB_NAME=banking_db
 REDIS_URL=localhost:6380
 JWT_SECRET=your_secret_here
 PORT=8080
@@ -164,29 +161,40 @@ NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
 
 ---
 
-## คำสั่ง Makefile
+## Makefile Commands
 
 ```bash
-make up            # Start Docker services
-make down          # Stop Docker services
-make logs          # Follow Docker logs
-make dev-backend   # Run Go backend (hot reload not included)
-make dev-frontend  # Run Next.js dev server
-make tidy          # Run go mod tidy
-make build-backend # Build Go binary
+make up             # เริ่ม Docker services
+make down           # หยุด Docker services
+make logs           # ดู Docker logs แบบ Follow
+make dev-backend    # รัน Go backend
+make dev-frontend   # รัน Next.js dev server
+make tidy           # go mod tidy
+make build-backend  # Build Go binary
 ```
 
 ---
 
-## หมายเหตุสถาปัตยกรรม
+## Architecture Notes
 
-- **Clean Architecture** — Handler → Service → Repository with interface abstractions
-- **Atomic Transfers** — Uses PostgreSQL transactions with `SELECT FOR UPDATE`, locks acquired in consistent UUID order to prevent deadlocks
-- **Account Lockout** — Failed login attempts tracked in DB; account locked for 15 minutes after 5 consecutive failures
-- **Standardized Responses** — All API responses follow `{ success, message, data }` schema
+- **Clean Architecture** — Handler → Service → Repository พร้อม Interface abstraction
+- **Atomic Transfers** — ใช้ PostgreSQL Transaction + `SELECT FOR UPDATE` ล็อค UUID ตามลำดับเพื่อป้องกัน Deadlock
+- **Account Lockout** — นับความพยายาม Login ผิดใน DB, ล็อคบัญชี 15 นาทีหลังผิด 5 ครั้ง
+- **Standardized Responses** — ทุก API Response ตาม Schema `{ success, message, data }`
 
 ---
 
-## ใบอนุญาต
+## pgAdmin
+
+เข้าใช้งานที่ `http://localhost:5050`
+
+| | |
+|---|---|
+| Email | `admin@admin.com` |
+| Password | `admin` |
+
+---
+
+## License
 
 MIT
