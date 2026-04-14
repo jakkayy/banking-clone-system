@@ -1,6 +1,6 @@
 # Environment
-.env
-*.env
+backend/.env
+frontend/.env.local
 
 # Go
 backend/vendor/
