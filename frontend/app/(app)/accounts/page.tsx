@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Card, CardBody, Chip, Spinner } from "@nextui-org/react";
-import AppLayout from "@/components/AppLayout";
 import { api } from "@/lib/api";
 import { getToken, formatMoney, accountTypeLabel } from "@/lib/auth";
 import { Account, ApiResponse } from "@/lib/types";
@@ -46,7 +45,6 @@ export default function AccountsPage() {
   const maxBalance = Math.max(...accounts.map((a) => a.balance), 1);
 
   return (
-    <AppLayout>
       <div className="min-h-screen p-8" style={{ backgroundColor: "#0a0a0a" }}>
         <div className="max-w-4xl mx-auto">
 
@@ -200,6 +198,5 @@ export default function AccountsPage() {
           )}
         </div>
       </div>
-    </AppLayout>
   );
 }

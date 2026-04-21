@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card, CardBody, Input, Select, SelectItem } from "@nextui-org/react";
-import AppLayout from "@/components/AppLayout";
 import { api } from "@/lib/api";
 import { getToken, accountTypeLabel, formatMoney } from "@/lib/auth";
 import { Account, ApiResponse } from "@/lib/types";
@@ -14,10 +13,10 @@ const inputClass = {
   input: "!text-white placeholder:!text-[#333]",
 };
 
-export default function TransferPage() {
+export default function DepositPage() {
   const router = useRouter();
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [form, setForm] = useState({ from_account_id: "", to_account_number: "", amount: "", description: "" });
+  const [form, setForm] = useState({ account_id: "", amount: "", description: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -28,36 +27,35 @@ export default function TransferPage() {
     api.accounts.list(token).then((res) => {
       const list = (res as ApiResponse<Account[]>).data ?? [];
       setAccounts(list);
-      if (list.length > 0) setForm((f) => ({ ...f, from_account_id: list[0].id }));
+      if (list.length > 0) setForm((f) => ({ ...f, account_id: list[0].id }));
     });
   }, []);
 
-  const selectedAccount = accounts.find((a) => a.id === form.from_account_id);
+  const selectedAccount = accounts.find((a) => a.id === form.account_id);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); setSuccess(""); setLoading(true);
     try {
-      await api.transactions.transfer({ ...form, amount: parseFloat(form.amount) }, getToken()!);
-      setSuccess("Transfer completed successfully");
-      setForm((f) => ({ ...f, to_account_number: "", amount: "", description: "" }));
+      await api.transactions.deposit({ ...form, amount: parseFloat(form.amount) }, getToken()!);
+      setSuccess("Deposit completed successfully");
+      setForm((f) => ({ ...f, amount: "", description: "" }));
       setTimeout(() => router.push("/dashboard"), 1500);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Transfer failed");
+      setError(err instanceof Error ? err.message : "Deposit failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AppLayout>
       <div className="min-h-screen p-8" style={{ backgroundColor: "#0a0a0a" }}>
         <div className="max-w-4xl mx-auto">
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-white text-2xl font-light">Transfer</h1>
-            <p className="text-xs tracking-widest uppercase mt-1" style={{ color: "#555" }}>Global Swift & Local</p>
+            <h1 className="text-white text-2xl font-light">Deposit</h1>
+            <p className="text-xs tracking-widest uppercase mt-1" style={{ color: "#555" }}>Direct Wire Transfer</p>
           </div>
 
           <div className="flex gap-6 items-start">
@@ -66,13 +64,13 @@ export default function TransferPage() {
               <CardBody className="p-8">
                 <form onSubmit={handleSubmit} className="space-y-7">
                   <Select
-                    label="From Account"
+                    label="To Account"
                     labelPlacement="outside"
                     variant="bordered"
-                    selectedKeys={form.from_account_id ? new Set([form.from_account_id]) : new Set()}
+                    selectedKeys={form.account_id ? new Set([form.account_id]) : new Set()}
                     onSelectionChange={(keys) => {
                       const val = Array.from(keys)[0] as string;
-                      if (val) setForm((f) => ({ ...f, from_account_id: val }));
+                      if (val) setForm((f) => ({ ...f, account_id: val }));
                     }}
                     classNames={{
                       label: "text-xs font-medium tracking-widest uppercase !text-[#555]",
@@ -90,17 +88,6 @@ export default function TransferPage() {
                   </Select>
 
                   <Input
-                    label="To Account Number"
-                    labelPlacement="outside"
-                    variant="bordered"
-                    placeholder="10-digit account number"
-                    maxLength={10}
-                    required
-                    value={form.to_account_number}
-                    onValueChange={(v) => setForm((f) => ({ ...f, to_account_number: v }))}
-                    classNames={inputClass}
-                  />
-                  <Input
                     label="Amount (THB)"
                     labelPlacement="outside"
                     type="number"
@@ -117,7 +104,7 @@ export default function TransferPage() {
                     label="Note (Optional)"
                     labelPlacement="outside"
                     variant="bordered"
-                    placeholder="e.g. Rent payment"
+                    placeholder="e.g. Monthly salary"
                     value={form.description}
                     onValueChange={(v) => setForm((f) => ({ ...f, description: v }))}
                     classNames={inputClass}
@@ -142,7 +129,7 @@ export default function TransferPage() {
                     className="font-semibold"
                     style={{ backgroundColor: "#C9A84C", color: "#0a0a0a" }}
                   >
-                    Confirm Transfer
+                    Confirm Deposit
                   </Button>
                 </form>
               </CardBody>
@@ -150,12 +137,12 @@ export default function TransferPage() {
 
             {/* Sidebar */}
             <div className="w-64 shrink-0 space-y-4">
-              {/* Selected account */}
+              {/* Current balance */}
               <div
                 className="rounded-xl p-5"
                 style={{ background: "linear-gradient(135deg, #1a1500 0%, #2a2000 100%)", border: "1px solid #3a3010" }}
               >
-                <p className="text-xs tracking-widest uppercase mb-3" style={{ color: "#8a7a40" }}>Available Balance</p>
+                <p className="text-xs tracking-widest uppercase mb-3" style={{ color: "#8a7a40" }}>Current Balance</p>
                 <p className="text-2xl font-light text-white mb-1">
                   {selectedAccount ? formatMoney(selectedAccount.balance) : "—"}
                 </p>
@@ -167,11 +154,11 @@ export default function TransferPage() {
               {/* Info card */}
               <Card shadow="none" className="border" style={{ backgroundColor: "#111", borderColor: "#1f1f1f" }}>
                 <CardBody className="p-4 space-y-3">
-                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#555" }}>Transfer Info</p>
+                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#555" }}>Deposit Info</p>
                   {[
+                    { label: "Method", value: "Direct Wire" },
                     { label: "Processing", value: "Instant" },
                     { label: "Fee", value: "No charge" },
-                    { label: "Limit", value: "No daily limit" },
                   ].map((item) => (
                     <div key={item.label} className="flex items-center justify-between">
                       <span className="text-xs" style={{ color: "#444" }}>{item.label}</span>
@@ -182,12 +169,11 @@ export default function TransferPage() {
               </Card>
 
               <p className="text-xs text-center px-2" style={{ color: "#333" }}>
-                Transfers are secured with 256-bit encryption
+                Funds are available immediately after deposit
               </p>
             </div>
           </div>
         </div>
       </div>
-    </AppLayout>
   );
 }

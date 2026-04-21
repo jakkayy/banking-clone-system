@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card, CardBody, Input, Select, SelectItem } from "@nextui-org/react";
-import AppLayout from "@/components/AppLayout";
 import { api } from "@/lib/api";
 import { getToken, accountTypeLabel, formatMoney } from "@/lib/auth";
 import { Account, ApiResponse } from "@/lib/types";
@@ -14,7 +13,7 @@ const inputClass = {
   input: "!text-white placeholder:!text-[#333]",
 };
 
-export default function DepositPage() {
+export default function WithdrawPage() {
   const router = useRouter();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [form, setForm] = useState({ account_id: "", amount: "", description: "" });
@@ -38,26 +37,25 @@ export default function DepositPage() {
     e.preventDefault();
     setError(""); setSuccess(""); setLoading(true);
     try {
-      await api.transactions.deposit({ ...form, amount: parseFloat(form.amount) }, getToken()!);
-      setSuccess("Deposit completed successfully");
+      await api.transactions.withdraw({ ...form, amount: parseFloat(form.amount) }, getToken()!);
+      setSuccess("Withdrawal completed successfully");
       setForm((f) => ({ ...f, amount: "", description: "" }));
       setTimeout(() => router.push("/dashboard"), 1500);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Deposit failed");
+      setError(err instanceof Error ? err.message : "Withdrawal failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AppLayout>
       <div className="min-h-screen p-8" style={{ backgroundColor: "#0a0a0a" }}>
         <div className="max-w-4xl mx-auto">
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-white text-2xl font-light">Deposit</h1>
-            <p className="text-xs tracking-widest uppercase mt-1" style={{ color: "#555" }}>Direct Wire Transfer</p>
+            <h1 className="text-white text-2xl font-light">Withdraw</h1>
+            <p className="text-xs tracking-widest uppercase mt-1" style={{ color: "#555" }}>Asset Liquidation</p>
           </div>
 
           <div className="flex gap-6 items-start">
@@ -66,7 +64,7 @@ export default function DepositPage() {
               <CardBody className="p-8">
                 <form onSubmit={handleSubmit} className="space-y-7">
                   <Select
-                    label="To Account"
+                    label="From Account"
                     labelPlacement="outside"
                     variant="bordered"
                     selectedKeys={form.account_id ? new Set([form.account_id]) : new Set()}
@@ -106,7 +104,7 @@ export default function DepositPage() {
                     label="Note (Optional)"
                     labelPlacement="outside"
                     variant="bordered"
-                    placeholder="e.g. Monthly salary"
+                    placeholder="e.g. Daily expenses"
                     value={form.description}
                     onValueChange={(v) => setForm((f) => ({ ...f, description: v }))}
                     classNames={inputClass}
@@ -131,7 +129,7 @@ export default function DepositPage() {
                     className="font-semibold"
                     style={{ backgroundColor: "#C9A84C", color: "#0a0a0a" }}
                   >
-                    Confirm Deposit
+                    Confirm Withdrawal
                   </Button>
                 </form>
               </CardBody>
@@ -139,12 +137,12 @@ export default function DepositPage() {
 
             {/* Sidebar */}
             <div className="w-64 shrink-0 space-y-4">
-              {/* Current balance */}
+              {/* Available balance */}
               <div
                 className="rounded-xl p-5"
                 style={{ background: "linear-gradient(135deg, #1a1500 0%, #2a2000 100%)", border: "1px solid #3a3010" }}
               >
-                <p className="text-xs tracking-widest uppercase mb-3" style={{ color: "#8a7a40" }}>Current Balance</p>
+                <p className="text-xs tracking-widest uppercase mb-3" style={{ color: "#8a7a40" }}>Available Balance</p>
                 <p className="text-2xl font-light text-white mb-1">
                   {selectedAccount ? formatMoney(selectedAccount.balance) : "—"}
                 </p>
@@ -156,9 +154,9 @@ export default function DepositPage() {
               {/* Info card */}
               <Card shadow="none" className="border" style={{ backgroundColor: "#111", borderColor: "#1f1f1f" }}>
                 <CardBody className="p-4 space-y-3">
-                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#555" }}>Deposit Info</p>
+                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#555" }}>Withdrawal Info</p>
                   {[
-                    { label: "Method", value: "Direct Wire" },
+                    { label: "Method", value: "Liquidation" },
                     { label: "Processing", value: "Instant" },
                     { label: "Fee", value: "No charge" },
                   ].map((item) => (
@@ -171,12 +169,11 @@ export default function DepositPage() {
               </Card>
 
               <p className="text-xs text-center px-2" style={{ color: "#333" }}>
-                Funds are available immediately after deposit
+                Ensure sufficient balance before confirming
               </p>
             </div>
           </div>
         </div>
       </div>
-    </AppLayout>
   );
 }

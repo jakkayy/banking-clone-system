@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Card, CardBody, Chip, Spinner } from "@nextui-org/react";
-import AppLayout from "@/components/AppLayout";
 import { api } from "@/lib/api";
 import { getToken, formatMoney, accountTypeLabel, formatDate } from "@/lib/auth";
 import { Account, Transaction, ApiResponse, PaginatedTransactions } from "@/lib/types";
@@ -56,7 +55,6 @@ export default function DashboardPage() {
     s === "completed" ? "warning" : s === "pending" ? "default" : "danger";
 
   return (
-    <AppLayout>
       <div className="min-h-screen p-8" style={{ backgroundColor: "#0a0a0a" }}>
         <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -220,6 +218,5 @@ export default function DashboardPage() {
         </div>
         </div>
       </div>
-    </AppLayout>
   );
 }

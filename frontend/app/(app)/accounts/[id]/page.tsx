@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Card, CardBody, Chip, Spinner } from "@nextui-org/react";
-import AppLayout from "@/components/AppLayout";
 import { api } from "@/lib/api";
 import { getToken, formatMoney, formatDate, accountTypeLabel } from "@/lib/auth";
 import { Account, Transaction, PaginatedTransactions, ApiResponse } from "@/lib/types";
@@ -54,21 +53,18 @@ export default function AccountDetailPage() {
 
   if (loading) {
     return (
-      <AppLayout>
-        <div className="min-h-screen p-8 flex items-center justify-center" style={{ backgroundColor: "#0a0a0a" }}>
-          <div className="flex items-center gap-3">
-            <Spinner size="sm" color="warning" />
-            <span className="text-sm" style={{ color: "#444" }}>Loading account...</span>
-          </div>
+      <div className="min-h-screen p-8 flex items-center justify-center" style={{ backgroundColor: "#0a0a0a" }}>
+        <div className="flex items-center gap-3">
+          <Spinner size="sm" color="warning" />
+          <span className="text-sm" style={{ color: "#444" }}>Loading account...</span>
         </div>
-      </AppLayout>
+      </div>
     );
   }
 
   if (!account) return null;
 
   return (
-    <AppLayout>
       <div className="min-h-screen p-8" style={{ backgroundColor: "#0a0a0a" }}>
         <div className="max-w-4xl mx-auto">
 
@@ -208,6 +204,5 @@ export default function AccountDetailPage() {
           )}
         </div>
       </div>
-    </AppLayout>
   );
 }
