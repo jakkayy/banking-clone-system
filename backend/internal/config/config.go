@@ -1,11 +1,14 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"time"
 
 	"github.com/joho/godotenv"
 )
+
+const defaultJWTSecret = "change-this-secret"
 
 type Config struct {
 	DBHost     string
@@ -17,6 +20,7 @@ type Config struct {
 	JWTSecret  string
 	JWTExpiry  time.Duration
 	ServerPort string
+	CORSOrigin string
 }
 
 func Load() (*Config, error) {
@@ -27,6 +31,11 @@ func Load() (*Config, error) {
 		jwtExpiry = 24 * time.Hour
 	}
 
+	secret := getEnv("JWT_SECRET", defaultJWTSecret)
+	if secret == defaultJWTSecret || len(secret) < 32 {
+		return nil, errors.New("JWT_SECRET must be set to a random string of at least 32 characters")
+	}
+
 	return &Config{
 		DBHost:     getEnv("DB_HOST", "localhost"),
 		DBPort:     getEnv("DB_PORT", "5432"),
@@ -34,9 +43,10 @@ func Load() (*Config, error) {
 		DBPassword: getEnv("DB_PASSWORD", "banking_password"),
 		DBName:     getEnv("DB_NAME", "banking_db"),
 		RedisURL:   getEnv("REDIS_URL", "localhost:6379"),
-		JWTSecret:  getEnv("JWT_SECRET", "change-this-secret"),
+		JWTSecret:  secret,
 		JWTExpiry:  jwtExpiry,
 		ServerPort: getEnv("SERVER_PORT", "8080"),
+		CORSOrigin: getEnv("CORS_ORIGIN", "*"),
 	}, nil
 }
 

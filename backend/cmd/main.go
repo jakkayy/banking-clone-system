@@ -39,7 +39,7 @@ func main() {
 
 	// Router
 	r := gin.Default()
-	r.Use(corsMiddleware())
+	r.Use(corsMiddleware(cfg.CORSOrigin))
 
 	v1 := r.Group("/api/v1")
 
@@ -72,9 +72,9 @@ func main() {
 	}
 }
 
-func corsMiddleware() gin.HandlerFunc {
+func corsMiddleware(origin string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Origin", origin)
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization")
 		if c.Request.Method == "OPTIONS" {

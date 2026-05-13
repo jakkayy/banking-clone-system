@@ -2,9 +2,10 @@ package transaction
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"time"
 
 	"github.com/google/uuid"
@@ -86,7 +87,7 @@ func (s *service) Transfer(ctx context.Context, userID uuid.UUID, req TransferRe
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.accountRepo.GetByIDWithLock(ctx, dbTx, second)
+	lockedSecond, err := s.accountRepo.GetByIDWithLock(ctx, dbTx, second)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +95,7 @@ func (s *service) Transfer(ctx context.Context, userID uuid.UUID, req TransferRe
 	// Re-check balance on the locked row
 	lockedFrom := lockedFirst
 	if first == toAcc.ID {
-		lockedFrom, _ = s.accountRepo.GetByIDWithLock(ctx, dbTx, fromAcc.ID)
+		lockedFrom = lockedSecond
 	}
 	if lockedFrom.Balance < req.Amount {
 		return nil, ErrInsufficientFunds
@@ -107,11 +108,15 @@ func (s *service) Transfer(ctx context.Context, userID uuid.UUID, req TransferRe
 		return nil, err
 	}
 
+	ref, err := generateRefNumber()
+	if err != nil {
+		return nil, err
+	}
 	fromID2 := fromAcc.ID
 	toID := toAcc.ID
 	t := &Transaction{
 		ID:              uuid.New(),
-		ReferenceNumber: generateRefNumber(),
+		ReferenceNumber: ref,
 		FromAccountID:   &fromID2,
 		ToAccountID:     &toID,
 		Amount:          req.Amount,
@@ -164,10 +169,14 @@ func (s *service) Deposit(ctx context.Context, userID uuid.UUID, req DepositRequ
 		return nil, err
 	}
 
+	ref, err := generateRefNumber()
+	if err != nil {
+		return nil, err
+	}
 	toID := accID
 	t := &Transaction{
 		ID:              uuid.New(),
-		ReferenceNumber: generateRefNumber(),
+		ReferenceNumber: ref,
 		ToAccountID:     &toID,
 		Amount:          req.Amount,
 		Type:            TypeDeposit,
@@ -223,10 +232,14 @@ func (s *service) Withdraw(ctx context.Context, userID uuid.UUID, req WithdrawRe
 		return nil, err
 	}
 
+	ref, err := generateRefNumber()
+	if err != nil {
+		return nil, err
+	}
 	fromID := accID
 	t := &Transaction{
 		ID:              uuid.New(),
-		ReferenceNumber: generateRefNumber(),
+		ReferenceNumber: ref,
 		FromAccountID:   &fromID,
 		Amount:          req.Amount,
 		Type:            TypeWithdrawal,
@@ -282,7 +295,10 @@ func (s *service) GetHistory(ctx context.Context, userID uuid.UUID, query Histor
 	return s.txRepo.GetByAccountID(ctx, accID, query.Page, query.Limit)
 }
 
-func generateRefNumber() string {
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return fmt.Sprintf("TXN%s%06d", time.Now().Format("20060102"), rng.Intn(999999))
+func generateRefNumber() (string, error) {
+	n, err := rand.Int(rand.Reader, big.NewInt(1_000_000))
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("TXN%s%06d", time.Now().Format("20060102"), n.Int64()), nil
 }

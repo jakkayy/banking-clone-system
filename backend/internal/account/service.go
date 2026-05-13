@@ -2,10 +2,10 @@ package account
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/rand"
-	"time"
+	"math/big"
 
 	"github.com/google/uuid"
 )
@@ -84,9 +84,12 @@ func (s *service) GetUserAccounts(ctx context.Context, userID uuid.UUID) ([]*Acc
 }
 
 func (s *service) generateUniqueAccountNumber(ctx context.Context) (string, error) {
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for range 10 {
-		number := fmt.Sprintf("%010d", rng.Intn(9_000_000_000)+1_000_000_000)
+		n, err := rand.Int(rand.Reader, big.NewInt(9_000_000_000))
+		if err != nil {
+			return "", err
+		}
+		number := fmt.Sprintf("%010d", n.Int64()+1_000_000_000)
 		existing, err := s.repo.GetByAccountNumber(ctx, number)
 		if err != nil {
 			return "", err
