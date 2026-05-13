@@ -55,7 +55,7 @@ export default function DashboardPage() {
     s === "completed" ? "warning" : s === "pending" ? "default" : "danger";
 
   return (
-      <div className="min-h-screen p-8" style={{ backgroundColor: "#0a0a0a" }}>
+      <div className="p-8">
         <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

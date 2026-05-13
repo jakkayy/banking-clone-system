@@ -45,7 +45,7 @@ export default function AccountsPage() {
   const maxBalance = Math.max(...accounts.map((a) => a.balance), 1);
 
   return (
-      <div className="min-h-screen p-8" style={{ backgroundColor: "#0a0a0a" }}>
+      <div className="p-8">
         <div className="max-w-4xl mx-auto">
 
           {/* Header */}

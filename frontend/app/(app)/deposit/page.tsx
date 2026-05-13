@@ -49,7 +49,7 @@ export default function DepositPage() {
   };
 
   return (
-      <div className="min-h-screen p-8" style={{ backgroundColor: "#0a0a0a" }}>
+      <div className="p-8">
         <div className="max-w-4xl mx-auto">
 
           {/* Header */}
@@ -62,7 +62,7 @@ export default function DepositPage() {
             {/* Form */}
             <Card shadow="none" className="border flex-1 min-w-0" style={{ backgroundColor: "#111", borderColor: "#1f1f1f" }}>
               <CardBody className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-7">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6 pt-1">
                   <Select
                     label="To Account"
                     labelPlacement="outside"
